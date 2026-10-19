@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { AppText } from '@/components/ui/text';
 import { AppInput } from '@/components/ui/input';
+import { AppButton } from '@/components/ui/button';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -303,11 +304,9 @@ const ProfileScreen = ({ navigation }: any) => {
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backBtn}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Image
-            source={require('@/assets/icons/back.png')}
-            style={styles.headerIcon}
-          />
+          <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
           <AppText variant="bold" style={styles.headerTitle}>
             Profile
           </AppText>
@@ -324,7 +323,11 @@ const ProfileScreen = ({ navigation }: any) => {
           contentContainerStyle={styles.scrollContent}
         >
           <View style={styles.photoSection}>
-            <View>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => bottomSheetRef.current?.expand()}
+              style={styles.avatarWrapper}
+            >
               <Image
                 source={
                   selectedImage
@@ -339,28 +342,35 @@ const ProfileScreen = ({ navigation }: any) => {
                   { backgroundColor: isAway ? colors.offline : colors.online },
                 ]}
               />
-            </View>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.editPhotoBtn}
               onPress={() => bottomSheetRef.current?.expand()}
+              activeOpacity={0.7}
             >
-              <AppText variant="bold" style={styles.editPhotoText}>
+              <Feather name="camera" size={14} color={colors.primary} />
+              <AppText variant="semiBold" style={styles.editPhotoText}>
                 Edit Photo
               </AppText>
             </TouchableOpacity>
+
             <UserProfileStatus user={user} />
           </View>
 
           <TouchableOpacity
             style={styles.awayToggle}
             onPress={handleToggleStatus}
+            activeOpacity={0.7}
           >
             <View style={styles.awayLeft}>
-              <Ionicons
-                name="person-circle-outline"
-                size={22}
-                color={colors.textPrimary}
-              />
+              <View style={styles.awayIconContainer}>
+                <Ionicons
+                  name="person-circle-outline"
+                  size={24}
+                  color={colors.textPrimary}
+                />
+              </View>
               <View style={styles.awayTextGroup}>
                 <AppText style={styles.awayText}>
                   You're{' '}
@@ -393,12 +403,14 @@ const ProfileScreen = ({ navigation }: any) => {
               value={profileData.name}
               onChangeText={val => updateField('name', val)}
               placeholder="Your name"
+              autoCapitalize="words"
             />
             <AppInput
               label="Display Name"
               value={profileData.displayName}
               onChangeText={val => updateField('displayName', val)}
               placeholder="Display name"
+              autoCapitalize="none"
             />
             <AppInput
               label="Email"
@@ -406,38 +418,43 @@ const ProfileScreen = ({ navigation }: any) => {
               onChangeText={val => updateField('email', val)}
               placeholder="Your email"
               disabled
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
             <AppInput
               label="Title"
               value={profileData.title}
               onChangeText={val => updateField('title', val)}
               placeholder="Your title"
+              autoCapitalize="words"
             />
             <AppInput
               label="Phone"
               value={profileData.phone}
               onChangeText={val => updateField('phone', val)}
               placeholder="Your phone number"
+              keyboardType="phone-pad"
             />
           </View>
 
-          <TouchableOpacity
-            style={[styles.saveButton, isSaving && { opacity: 0.7 }]}
-            activeOpacity={0.8}
+          <AppButton
+            title="Save"
             onPress={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving && <ActivityIndicator color={colors.white} />}
-            <AppText variant="bold" style={styles.saveButtonText}>
-              Save
-            </AppText>
-          </TouchableOpacity>
+            loading={isSaving}
+            style={styles.saveButton}
+          />
 
           <TouchableOpacity
             style={styles.leaveOrgButton}
             activeOpacity={0.8}
             onPress={() => leaveOrgSheetRef.current?.expand()}
           >
+            <Ionicons
+              name="log-out-outline"
+              size={18}
+              color={colors.error}
+              style={styles.leaveOrgIcon}
+            />
             <AppText variant="bold" style={styles.leaveOrgButtonText}>
               Leave Organisation
             </AppText>

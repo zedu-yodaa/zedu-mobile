@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
-import { Image, Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { normalize } from '@/utils/normalize';
@@ -23,6 +24,14 @@ import { Chat } from '@/types/chats';
 import { useTheme } from '@/theme/ThemeProvider';
 
 const Tab = createBottomTabNavigator();
+
+export const getTabIconName = (routeName: string): string => {
+  if (routeName === 'Chats') return 'message-circle';
+  if (routeName === 'Channels') return 'hash';
+  if (routeName === 'Threads') return 'at-sign';
+  if (routeName === 'Buzz') return 'phone';
+  return 'settings';
+};
 
 const getChannelUnreadCount = (channel: Channel): number => {
   if (channel.thread_count > 0) {
@@ -265,23 +274,13 @@ const TabNavigator = ({
         tabBarStyle: tabBarStyle,
         tabBarLabelStyle: tabStyles.tabBarLabel,
         tabBarIcon: ({ focused }: any) => {
-          let iconSource;
-          const iconStyle = {
-            width: normalize(24),
-            height: normalize(24),
-            tintColor: focused ? colors.primary : colors.textSecondary,
-          };
+          const iconColor = focused ? colors.primary : colors.textSecondary;
+          const iconSize = normalize(24);
+          const iconName = getTabIconName(route.name);
 
-          if (route.name === 'Chats')
-            iconSource = require('@/assets/tabs/chats.png');
-          else if (route.name === 'Channels')
-            iconSource = require('@/assets/tabs/channels.png');
-          else if (route.name === 'Threads')
-            iconSource = require('@/assets/tabs/mentions.png');
-          else if (route.name === 'Buzz')
-            iconSource = require('@/assets/tabs/buzz.png');
-          else if (route.name === 'Settings')
-            iconSource = require('@/assets/tabs/settings.png');
+          const tabIcon = (
+            <Feather name={iconName} size={iconSize} color={iconColor} />
+          );
 
           const showTabBadge =
             (route.name === 'Chats' && showChatsTabBadge) ||
@@ -309,7 +308,7 @@ const TabNavigator = ({
             return (
               <View style={tabStyles.tabIconWrap}>
                 <View style={tabStyles.tabIconInner}>
-                  <Image source={iconSource} style={iconStyle} />
+                  {tabIcon}
                   {showTabBadge && (
                     <View
                       style={[
@@ -333,7 +332,11 @@ const TabNavigator = ({
             );
           }
 
-          return <Image source={iconSource} style={iconStyle} />;
+          return (
+            <View style={tabStyles.tabIconWrap}>
+              <View style={tabStyles.tabIconInner}>{tabIcon}</View>
+            </View>
+          );
         },
       })}
       // Listen to tab changes
